@@ -313,38 +313,44 @@ nav {
 }
 
 /* ── GALLERY ── */
-.gallery { padding: 6rem 5rem; background: var(--white); }
-.gallery-header { margin-bottom: 3rem; }
+.gallery { padding: 6rem 0 6rem 5rem; background: var(--white); overflow: hidden; }
+.gallery-header { padding-right: 5rem; margin-bottom: 2rem; }
 .gallery-header h2 {
   font-family: 'Playfair Display', serif;
   font-size: clamp(2rem, 3vw, 2.8rem);
   font-weight: 600; line-height: 1.1; color: var(--black);
 }
 .gallery-header h2 em { font-style: italic; color: var(--gold); font-weight: 300; }
-.gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: 260px 260px 260px;
+.gallery-carousel {
+  display: flex;
   gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-right: 5rem;
+  cursor: grab;
 }
-.gallery-item {
-  overflow: hidden; border-radius: 8px;
+.gallery-carousel::-webkit-scrollbar { display: none; }
+.gallery-carousel.grabbing { cursor: grabbing; }
+.gallery-carousel .gallery-item {
+  flex: 0 0 260px;
+  height: 320px;
+  scroll-snap-align: start;
+  overflow: hidden;
+  border-radius: 8px;
   background: var(--light);
-  display: flex; align-items: center; justify-content: center;
 }
-.gallery-item.tall { grid-row: span 2; }
-.gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
-.gallery-item:hover img { transform: scale(1.05); }
-.gallery-placeholder {
+.gallery-carousel .gallery-item img {
   width: 100%; height: 100%;
-  display: flex; align-items: center; justify-content: center;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+  pointer-events: none;
 }
-.gallery-placeholder span {
-  font-size: 0.65rem; letter-spacing: 0.1em;
-  text-transform: uppercase; color: #aaa;
-}
+.gallery-carousel .gallery-item:hover img { transform: scale(1.04); }
 .gallery-ig {
-  margin-top: 2rem; display: inline-flex; align-items: center; gap: 0.5rem;
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  margin-top: 1.75rem;
   color: var(--black); opacity: 0.4; font-size: 0.73rem;
   letter-spacing: 0.1em; text-transform: uppercase;
   text-decoration: none; transition: opacity 0.2s;
@@ -521,9 +527,9 @@ footer {
   .services-grid { grid-template-columns: 1fr; }
   .services-grid .service-item { border-right: none; }
   .tab-btn { padding: 0.75rem 1rem; font-size: 0.65rem; }
-  .gallery { padding: 4rem 2rem; }
-  .gallery-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
-  .gallery-item.tall { grid-row: span 1; }
+  .gallery { padding: 4rem 0 4rem 2rem; }
+  .gallery-header { padding-right: 2rem; }
+  .gallery-carousel { padding-right: 2rem; }
   .pull-quote { padding: 4rem 2rem; }
   .testimonials { padding: 4rem 0 4rem 2rem; }
   .testimonials-header { padding-right: 2rem; }
@@ -684,34 +690,16 @@ footer {
     <p class="section-label">The work</p>
     <h2>A few recent <em>looks</em></h2>
   </div>
-  <div class="gallery-grid">
-    <div class="gallery-item tall">
-      <img src="gallery-5.jpg" alt="Vibrant red colour by Alfiya">
-    </div>
-    <div class="gallery-item">
-      <img src="gallery-9.jpg" alt="Sleek highlighted blowout">
-    </div>
-    <div class="gallery-item">
-      <img src="gallery-6.jpg" alt="Copper colour and waves">
-    </div>
-    <div class="gallery-item">
-      <img src="gallery-1.jpg" alt="Happy client with Alfiya">
-    </div>
-    <div class="gallery-item">
-      <img src="gallery-4.jpg" alt="Styled updo with highlights">
-    </div>
-    <div class="gallery-item tall">
-      <img src="gallery-3.jpg" alt="Client with beautiful curls">
-    </div>
-    <div class="gallery-item">
-      <img src="gallery-7.jpg" alt="Happy client with Alfiya">
-    </div>
-    <div class="gallery-item">
-      <img src="gallery-2.jpg" alt="Client with fresh cut">
-    </div>
-    <div class="gallery-item">
-      <img src="gallery-8.jpg" alt="Happy client after cut">
-    </div>
+  <div class="gallery-carousel" id="gCarousel">
+    <div class="gallery-item"><img src="gallery-5.jpg" alt="Vibrant red colour by Alfiya"></div>
+    <div class="gallery-item"><img src="gallery-6.jpg" alt="Copper colour and waves"></div>
+    <div class="gallery-item"><img src="gallery-9.jpg" alt="Sleek highlighted blowout"></div>
+    <div class="gallery-item"><img src="gallery-4.jpg" alt="Styled updo with highlights"></div>
+    <div class="gallery-item"><img src="gallery-3.jpg" alt="Client with beautiful curls"></div>
+    <div class="gallery-item"><img src="gallery-1.jpg" alt="Happy client with Alfiya"></div>
+    <div class="gallery-item"><img src="gallery-7.jpg" alt="Happy client with Alfiya"></div>
+    <div class="gallery-item"><img src="gallery-2.jpg" alt="Client with fresh cut"></div>
+    <div class="gallery-item"><img src="gallery-8.jpg" alt="Happy client after cut"></div>
   </div>
   <a href="https://www.instagram.com/hairbyalfiya/" target="_blank" class="gallery-ig">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/></svg>
@@ -914,6 +902,21 @@ footer {
     if (!isDown) return;
     e.preventDefault();
     carousel.scrollLeft = scrollStart - (e.pageX - startX);
+  });
+  // Gallery carousel drag
+  var gCarousel = document.getElementById('gCarousel');
+  var gDown = false, gStartX, gScrollStart;
+  gCarousel.addEventListener('mousedown', function(e) {
+    gDown = true; gStartX = e.pageX; gScrollStart = gCarousel.scrollLeft;
+    gCarousel.classList.add('grabbing');
+  });
+  document.addEventListener('mouseup', function() {
+    gDown = false; gCarousel.classList.remove('grabbing');
+  });
+  gCarousel.addEventListener('mousemove', function(e) {
+    if (!gDown) return;
+    e.preventDefault();
+    gCarousel.scrollLeft = gScrollStart - (e.pageX - gStartX);
   });
 </script>
 </body>
